@@ -12,7 +12,7 @@ try {
     enemyImg = new Image();
     enemyImg.src = 'assets/images/enemy.png';
     backgroundImg = new Image();
-    backgroundImg.src = 'assets/images/background.png';
+    backgroundImg.src = 'assets/images/background.jpg';  // New background image
     shootSound = new Audio('assets/sounds/shoot.wav');
     explosionSound = new Audio('assets/sounds/explosion.wav');
 } catch (e) {
@@ -25,7 +25,7 @@ let player = {
     y: canvas.height - 80,
     width: 50,
     height: 50,
-    speed: 7,  // Increased from 5 to 7 for faster movement
+    speed: 5,
     health: 100
 };
 let bullets = [];
@@ -35,9 +35,9 @@ let gameOver = false;
 
 function drawBackground() {
     if (backgroundImg && backgroundImg.complete) {
-        ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);  // Draw background image
     } else {
-        ctx.fillStyle = 'black';
+        ctx.fillStyle = 'black';  // Fallback to black if image fails
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 }
@@ -56,7 +56,7 @@ function drawPlayer() {
         ctx.fillStyle = 'white';
         ctx.fillRect(player.x, player.y, player.width, player.height);
     }
-    ctx.fillStyle = 'green';
+    ctx.fillStyle = 'green';  // Green health bar
     ctx.fillRect(player.x, player.y - 20, player.width * (player.health / 100), 10);
 }
 
@@ -82,7 +82,7 @@ function spawnEnemy() {
         y: -40,
         width: 40,
         height: 40,
-        speed: 3 + Math.random() * 3  // Increased from 2 + Math.random() * 2 for faster enemies
+        speed: 2 + Math.random() * 2
     });
 }
 
@@ -100,9 +100,13 @@ function update() {
         return;
     }
 
+    // Draw background first (behind everything else)
     drawBackground();
+
+    // Draw heading at the top
     drawHeading();
 
+    // Player movement
     document.onkeydown = (e) => {
         if (e.key === 'ArrowLeft' && player.x > 0) player.x -= player.speed;
         if (e.key === 'ArrowRight' && player.x < canvas.width - player.width) player.x += player.speed;
@@ -113,12 +117,14 @@ function update() {
         if (e.key === 'r' && gameOver) resetGame();
     };
 
-    bullets = bullets.filter(b => b.y > -b.radius);
+    // Update bullets
+    bulbs = bullets.filter(b => b.y > -b.radius);
     bullets.forEach(b => {
-        b.y -= 10;  // Increased from 7 to 10 for faster bullets
+        b.y -= 7;
         drawBullet(b);
     });
 
+    // Spawn and update enemies
     if (Math.random() < 0.03) spawnEnemy();
     enemies = enemies.filter(e => e.y < canvas.height);
     enemies.forEach(e => {
@@ -126,6 +132,7 @@ function update() {
         drawEnemy(e);
     });
 
+    // Collision detection
     for (let i = enemies.length - 1; i >= 0; i--) {
         for (let j = bullets.length - 1; j >= 0; j--) {
             if (Math.hypot(enemies[i].x - bullets[j].x, enemies[i].y - bullets[j].y) < enemies[i].width / 2 + bullets[j].radius) {
@@ -152,7 +159,7 @@ function update() {
 }
 
 function resetGame() {
-    player = { x: canvas.width / 2 - 25, y: canvas.height - 80, width: 50, height: 50, speed: 7, health: 100 };
+    player = { x: canvas.width / 2 - 25, y: canvas.height - 80, width: 50, height: 50, speed: 5, health: 100 };
     bullets = [];
     enemies = [];
     score = 0;
