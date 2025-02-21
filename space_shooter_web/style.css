@@ -1,7 +1,7 @@
 body {
     margin: 0;
     padding: 0;
-    background: #000;
+    /* Removed background: #000; to let the canvas background image show through */
     display: flex;
     justify-content: center;
     align-items: center;

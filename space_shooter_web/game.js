@@ -4,11 +4,15 @@ const scoreDisplay = document.getElementById('score');
 const gameOverDisplay = document.getElementById('gameOver');
 const finalScoreDisplay = document.getElementById('finalScore');
 
-// Optional: Load assets if you have them
-let spaceshipImg, shootSound, explosionSound;
+// Load assets
+let spaceshipImg, enemyImg, backgroundImg, shootSound, explosionSound;
 try {
     spaceshipImg = new Image();
     spaceshipImg.src = 'assets/images/spaceship.png';
+    enemyImg = new Image();
+    enemyImg.src = 'assets/images/enemy.png';
+    backgroundImg = new Image();
+    backgroundImg.src = 'assets/images/background.jpg';  // New background image
     shootSound = new Audio('assets/sounds/shoot.wav');
     explosionSound = new Audio('assets/sounds/explosion.wav');
 } catch (e) {
@@ -29,11 +33,20 @@ let enemies = [];
 let score = 0;
 let gameOver = false;
 
+function drawBackground() {
+    if (backgroundImg && backgroundImg.complete) {
+        ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);  // Draw background image
+    } else {
+        ctx.fillStyle = 'black';  // Fallback to black if image fails
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
 function drawHeading() {
     ctx.fillStyle = 'cyan';
     ctx.font = '30px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('First Ever Grok-Made Game', canvas.width / 2, 50);
+    ctx.fillText('xAI SpaceX: First Ever Grok-Made Game', canvas.width / 2, 50);
 }
 
 function drawPlayer() {
@@ -43,20 +56,24 @@ function drawPlayer() {
         ctx.fillStyle = 'white';
         ctx.fillRect(player.x, player.y, player.width, player.height);
     }
-    ctx.fillStyle = 'red';
+    ctx.fillStyle = 'green';  // Green health bar
     ctx.fillRect(player.x, player.y - 20, player.width * (player.health / 100), 10);
 }
 
 function drawBullet(bullet) {
-    ctx.fillStyle = 'purple';  // Changed from 'yellow' to 'purple'
+    ctx.fillStyle = 'purple';
     ctx.beginPath();
     ctx.arc(bullet.x, bullet.y, 5, 0, Math.PI * 2);
     ctx.fill();
 }
 
 function drawEnemy(enemy) {
-    ctx.fillStyle = 'red';
-    ctx.fillRect(enemy.x, enemy.y, 40, 40);
+    if (enemyImg && enemyImg.complete) {
+        ctx.drawImage(enemyImg, enemy.x, enemy.y, enemy.width, enemy.height);
+    } else {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+    }
 }
 
 function spawnEnemy() {
@@ -83,7 +100,8 @@ function update() {
         return;
     }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Draw background first (behind everything else)
+    drawBackground();
 
     // Draw heading at the top
     drawHeading();
@@ -100,7 +118,7 @@ function update() {
     };
 
     // Update bullets
-    bullets = bullets.filter(b => b.y > -b.radius);
+    bulbs = bullets.filter(b => b.y > -b.radius);
     bullets.forEach(b => {
         b.y -= 7;
         drawBullet(b);
